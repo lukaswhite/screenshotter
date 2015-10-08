@@ -1,0 +1,28 @@
+{
+    "name": "lukaswhite/laravel-screenshotter",
+    "description": "A Laravel package for taking website screenshots using PhantomJS",
+    "require": {        
+        "twig/twig": "^2.0@dev"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.0"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Lukas White",
+            "email": "hello@lukaswhite.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-0": {
+            "Lukaswhite": "src/"
+        }
+    },
+    "scripts": {
+        "post-install-cmd": [    
+            "php -r \"exec('chmod -R +x vendor/lukaswhite/screenshotter/src/Lukaswhite/Screenshotter/bin');\""
+        ]
+    }
+}
