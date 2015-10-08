@@ -61,7 +61,7 @@ $screenshot = $screenshotter->capture(
 - `$width`; if you don't provide this, it's set to 1024px
 - `$height`; if you don't provide this, it's set to 768px
 - `$clipW`; the width to crop (optional)
-- `$height`; the height to crop (optional)
+- `$clipH`; the height to crop (optional)
 
 ####Return value:
 
@@ -85,8 +85,8 @@ $screenshot = $screenshotter->capture(
   'http://www.lukaswhite.com',
   'lukaswhitedotcom.png',
   [
-    'cropW' => 1024,
-    'cropH' => 768
+    'clipW' => 1024,
+    'clipH' => 768
   ]
 );
 ```
@@ -98,8 +98,8 @@ $screenshot = $screenshotter->capture(
   [
     'width' => 640,
     'height' => 480,
-    'cropW' => 640,
-    'cropH' => 480
+    'clipW' => 640,
+    'clipH' => 480
   ]
 );
 ```
