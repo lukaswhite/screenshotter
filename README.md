@@ -69,7 +69,7 @@ The path to the screenshot.
 
 ####Note on Cropping
 
-If you don't set a crop width & height, the resulting screenshot will be as tall as the web page, regardless of the `$height` setting. In most cases, you'll probably want to set `$cropW` and `$cropH` to match `$width` and `$height` respectively.
+If you don't set a crop width & height, the resulting screenshot will be as tall as the web page, regardless of the `$height` setting. In most cases, you'll probably want to set `$clipW` and `$clipH` to match `$width` and `$height` respectively.
 
 ####Examples
 
