@@ -8,12 +8,12 @@ use Twig_Environment;
 
 class Screenshotter {
 
-	/**
-   * The filesystem instance.
+  /**
+   * The output path; i.e., where to put the resulting screenshots
    *
-   * @var \Illuminate\Filesystem\Filesystem
+   * @var string
    */
-  protected $files;
+  private $outputPath;
 
   /**
    * The cache (temporary) path
@@ -21,13 +21,6 @@ class Screenshotter {
    * @var string
    */
  	private $cachePath;
-
- 	/**
-   * The output path; i.e., where to put the resulting screenshots
-   *
-   * @var string
-   */
- 	private $outputPath;
 
   /**
    * The default width
@@ -99,16 +92,6 @@ class Screenshotter {
   }
 
   /**
-   * Adds a trailing slash to a path, if it doesn't already have one.
-   * 
-   * @param  string $path
-   * @return string
-   */
-  private function getPathWithTrailingSlash($path) {
-  	return rtrim($path, '/') . '/';
-  }
-
-  /**
    * Set the default width
    *
    * @param  int
@@ -124,7 +107,7 @@ class Screenshotter {
    * Set the default height
    *
    * @param  int
-   * @return \Lukaswhite\Screenshotter
+   * @return \Lukaswhite\Screenshotter\Screenshotter
    */
   public function setHeight($height)
   {
@@ -135,8 +118,8 @@ class Screenshotter {
   /**
    * Set the timeout
    *
-   * @param  int
-   * @return \Lukaswhite\Screenshotter
+   * @param  int  The timeout in seconds
+   * @return \Lukaswhite\Screenshotter\Screenshotter
    */
   public function setTimeout($timeout)
   {
@@ -276,7 +259,7 @@ class Screenshotter {
       '%s/bin/%s/phantomjs%s',
       __DIR__,
       $system, 
-      $this->getExtension($system)
+      $this->getPhantomJsExtension($system)
     );
 
   }
@@ -291,13 +274,13 @@ class Screenshotter {
     $uname = strtolower(php_uname());
 
     if (str_contains($uname, 'darwin')) {
-        return 'macosx';
+      return 'macosx';
     } elseif (str_contains($uname, 'win')) {
-        return 'windows';
+      return 'windows';
     } elseif (str_contains($uname, 'linux')) {
-        return PHP_INT_SIZE === 4 ? 'linux-i686' : 'linux-x86_64';
+      return PHP_INT_SIZE === 4 ? 'linux-i686' : 'linux-x86_64';
     } else {
-        throw new \RuntimeException('Unknown operating system.');
+      throw new \RuntimeException('Unknown operating system.');
     }
   }
 
@@ -307,9 +290,19 @@ class Screenshotter {
    * @param  string  $system
    * @return string
    */
-  protected function getExtension($system)
+  protected function getPhantomJsExtension($system)
   {
 		return $system == 'windows' ? '.exe' : '';
+  }
+
+  /**
+   * Adds a trailing slash to a path, if it doesn't already have one.
+   * 
+   * @param  string $path
+   * @return string
+   */
+  private function getPathWithTrailingSlash($path) {
+    return rtrim($path, '/') . '/';
   }
 
 }

@@ -1,6 +1,6 @@
 {
-    "name": "lukaswhite/laravel-screenshotter",
-    "description": "A Laravel package for taking website screenshots using PhantomJS",
+    "name": "lukaswhite/screenshotter",
+    "description": "A PHP package for taking website screenshots using PhantomJS",
     "require": {        
         "twig/twig": "^2.0@dev"
     },
