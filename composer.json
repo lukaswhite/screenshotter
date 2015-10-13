@@ -2,7 +2,7 @@
     "name": "lukaswhite/screenshotter",
     "description": "A PHP package for taking website screenshots using PhantomJS",
     "require": {        
-        "twig/twig": "^2.0.*@dev"
+        "twig/twig": "2.0.*@dev"
     },
     "require-dev": {
         "phpunit/phpunit": "~4.0"
