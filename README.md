@@ -58,18 +58,18 @@ $screenshot = $screenshotter->capture(
 * `$url` is the URL of the website / web page you want to take a screenshot of.
 * `$filename` is the filename to save the screenshot to.
 * `$options` is an optional array of additional options:
-- `$width`; if you don't provide this, it's set to 1024px
-- `$height`; if you don't provide this, it's set to 768px
-- `$clipW`; the width to crop (optional)
-- `$clipH`; the height to crop (optional)
+	- `$width`; if you don't provide this, it's set to 1024px
+	- `$height`; if you don't provide this, it's set to 768px
+	- `$clipW`; the width to clip (optional)
+	- `$clipH`; the height to clip (optional)
 
 ####Return value:
 
 The path to the screenshot.
 
-####Note on Cropping
+####Note on Clipping
 
-If you don't set a crop width & height, the resulting screenshot will be as tall as the web page, regardless of the `$height` setting. In most cases, you'll probably want to set `$clipW` and `$clipH` to match `$width` and `$height` respectively.
+If you don't set a clip width & height, the resulting screenshot will be as tall as the web page, regardless of the `$height` setting. In most cases, you'll probably want to set `$clipW` and `$clipH` to match `$width` and `$height` respectively.
 
 ####Examples
 
@@ -103,6 +103,60 @@ $screenshot = $screenshotter->capture(
   ]
 );
 ```
+
+###Additional Options
+
+####Wait time
+
+Phantomjs loads a page and then waits a certain length of time before taking the screenshot. This is to allow the page to be fully rendered, for images and fonts to be loaded, and so on. 
+
+By default it waits for one second. To set the wait time to something else, call the following method:
+
+```
+setWait( $value )
+```
+
+The value should be in *milliseconds*, for example:
+
+```
+$screenshotter->setWait( 3000 ); // wait for three seconds
+```
+
+####SSL Protocol
+
+Phantomjs sometimes has difficulty connecting to HTTPS sites. Chances are if that's the case, the process will appear to suceed but the screenshot will be blank.
+
+In many cases this is because by default Phantomjs uses SSLv3 to connect, which is often either unsupported or - thanks to the [POODLE attack](https://community.qualys.com/blogs/securitylabs/2014/10/15/ssl-3-is-dead-killed-by-the-poodle-attack) - has been disabled.
+
+To get around this, you can use the `setSSLProtocol()` method to explictly tell Phantomjs which SSL protocol to use; the following values are valid:
+
+* `sslv3`
+* `sslv2`
+* `tlsv1`
+* `any`
+
+In most cases, the simplest approach is simply to set it to `all`, i.e.:
+
+```
+$screenshotter->setSSLProtocol( 'any' );
+```
+
+####Ignore SSL Errors
+
+Certain SSL errors can also cause difficulty; notably expired or self-signed certificates. You can tell Phantomjs to ignore SSL errors with the following:
+
+```
+$screenshotter->ignoreSSLErrors();
+// or
+$screenshotter->ignoreSSLErrors( TRUE );
+```
+
+To tell it *not* to ignore SSL errors - which is the default behaviour - simply set it to `FALSE`:
+
+```
+$screenshotter->ignoreSSLErrors( FALSE );
+```
+
 
 ###Exceptions
 
