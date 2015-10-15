@@ -3,6 +3,7 @@
 namespace Lukaswhite\Screenshotter;
 
 use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 use Twig_Loader_Filesystem;
 use Twig_Environment;
 
@@ -44,12 +45,27 @@ class Screenshotter {
   public $timeout = 10;
 
   /**
-   * Create a new invoice instance.
+   * The default wait time (ms)
    *
-   * 
-   * @return void
+   * @var int
    */
-  
+  public $wait = 1000;
+
+  /**
+   * The SSL protocol to use for secure connections
+   * 
+   * @var string (sslv3|sslv2|tlsv1|any)
+   */
+  public $ssl_protocol;
+
+  /**
+   * Whether to ignore SSL errors, e.g. such as expired or self-signed certificate errors
+   * 
+   * @var boolean
+   */
+  public $ssl_ignore = TRUE;
+
+
   /**
    * Create a new instance of the screenshotter service.
    *
@@ -128,6 +144,48 @@ class Screenshotter {
   }
 
   /**
+   * Set the wait time. That is to say, how long the process should wait for the page to be 
+   * rendered before taking the screenshot.
+   *
+   * @param  int  The wait time in milliseconds
+   * @return \Lukaswhite\Screenshotter\Screenshotter
+   */
+  public function setWait($wait)
+  {
+    $this->wait = intval($wait);
+    return $this;
+  }
+
+  /**
+   * Sets the SSL protocol
+   * 
+   * @param string $ssl_protocol (sslv3|sslv2|tlsv1|any)
+   * @return \Lukaswhite\Screenshotter\Screenshotter
+   * @throws \Exception
+   */
+  public function setSSLProtocol($ssl_protocol)
+  {    
+    $valid_protocols = ['sslv3', 'sslv2', 'tlsv1', 'any'];
+    if (!in_array($ssl_protocol, $valid_protocols)) {
+      throw new \Exception(sprintf('Protocol must be one of %s', implode(', ', $valid_protocols)));
+    }
+    $this->ssl_protocol = $ssl_protocol;
+    return $this;
+  }
+
+  /**
+   * Whether to ignore SSL errors
+   * 
+   * @param  boolean $ssl_ignore
+   * @return \Lukaswhite\Screenshotter\Screenshotter
+   */
+  public function ignoreSSLErrors($ssl_ignore = TRUE)
+  {
+    $this->ssl_ignore = TRUE;
+    return $this;
+  }
+
+  /**
    * Capture a screenshot
    * 
    * @param  string $url      The URL to take a screenshot of
@@ -135,6 +193,7 @@ class Screenshotter {
    * @param  array  $options  An optional array of parameters; e.g. width, height, clipW, clipH
    * @return string           The filepath of the screenshot
    * @throws \Symfony\Component\Process\Exception\ProcessTimedOutException
+   * @throws \Symfony\Component\Process\Exception\ProcessFailedException
    */
 	public function capture($url, $filename, $options = [])
 	{
@@ -144,11 +203,12 @@ class Screenshotter {
 			'filename'	=>	$filename,
 			'width' 		=> 	$this->width,
 			'height' 		=> 	$this->height,
+      'wait'      =>  $this->wait,
 		];
 	
 		// Optionally override with provided values, calling intval() because
 		// they all represent sizes in pixels
-		foreach(['width', 'height', 'clipW', 'clipH'] as $property) {
+		foreach(['width', 'height', 'clipW', 'clipH', 'wait'] as $property) {
 			if (isset($options[$property])) {
 				$params[$property] = intval($options[$property]);
 			}			
@@ -160,8 +220,11 @@ class Screenshotter {
 		// Build the destination path
 		$filepath = $this->outputPath . $filename;
 
-		$this->getPhantomProcess($jobPath, $filepath)->setTimeout($this->timeout)->mustRun();		
+		$process = $this->getPhantomProcess($jobPath, $filepath)->setTimeout($this->timeout);
 
+    // Can thow ProcessFailedException or ProcessTimedOutException
+    $process->mustRun();		
+    
 		return $filepath;
 
 	}
@@ -230,13 +293,28 @@ class Screenshotter {
    *
    * @param  string  $viewPath
    * @return \Symfony\Component\Process\Process
+   * @todo Use Symfony's Process builde instead of string concatenation
    */
   public function getPhantomProcess($jobPath, $screenshotPath)
   {    
+    
+    // Start building the command, starting with the full path to the phantomjs executable
+    $command = $this->getPhantomjsPath();
+
+    // Optionally add a flag to specify the SSL protocol
+    if ($this->ssl_protocol) {
+      $command .= sprintf(' --ssl-protocol=%s', $this->ssl_protocol);
+    }
+
+    // Optionally set the flag to ignore SSL errors
+    if ($this->ssl_ignore) {
+      $command .= ' --ignore-ssl-errors=true';
+    }
+
     return new Process(
     	sprintf(
     		'%s %s %s', 
-    		$this->getPhantomjsPath(),
+    		$command,
     		$jobPath, 
     		$screenshotPath
     	),

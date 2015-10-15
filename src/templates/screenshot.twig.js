@@ -18,6 +18,8 @@ page.clipRect = {
 {% endif %}
 
 page.open('{{ url }}', function () {
-	page.render(filepath);
-	phantom.exit();
+	setTimeout(function(){
+		page.render(filepath);
+		phantom.exit();
+	}, {{ wait }});
 });
