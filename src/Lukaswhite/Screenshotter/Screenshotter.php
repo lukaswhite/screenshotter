@@ -351,15 +351,31 @@ class Screenshotter {
   {
     $uname = strtolower(php_uname());
 
-    if (str_contains($uname, 'darwin')) {
+    if ($this->strContains($uname, 'darwin')) {
       return 'macosx';
-    } elseif (str_contains($uname, 'win')) {
+    } elseif ($this->strContains($uname, 'win')) {
       return 'windows';
-    } elseif (str_contains($uname, 'linux')) {
+    } elseif ($this->strContains($uname, 'linux')) {
       return PHP_INT_SIZE === 4 ? 'linux-i686' : 'linux-x86_64';
     } else {
       throw new \RuntimeException('Unknown operating system.');
     }
+  }
+
+  /**
+   * Utility method; determines if the string $haystack contains
+   * the string $needle 
+   * 
+   * @param  string $haystack
+   * @param  string $needle
+   * @return bool
+   */
+  private function strContains($haystack, $needle)
+  {
+    if ($needle != '' && strpos($haystack, $needle) !== false) {
+      return true;
+    }
+    return false;
   }
 
   /**
